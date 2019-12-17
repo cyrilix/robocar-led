@@ -4,7 +4,7 @@ import (
 	"log"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/host"
-	"periph.io/x/periph/host/rpi"
+	"periph.io/x/periph/host/bcm283x"
 	"sync"
 	"time"
 )
@@ -18,16 +18,17 @@ func init() {
 }
 
 func New() *PiColorLed {
-	return &PiColorLed{
-		pinRed:          rpi.P1_22,
-		pinGreen:        rpi.P1_23,
-		pinBlue:         rpi.P1_24,
+	led := PiColorLed{
+		pinRed:          bcm283x.GPIO23,
+		pinGreen:        bcm283x.GPIO24,
+		pinBlue:         bcm283x.GPIO25,
 		redValue:        0,
 		greenValue:      0,
 		blueValue:       0,
 		cancelBlinkChan: make(chan interface{}),
 		blinkEnabled:    false,
 	}
+	return &led
 }
 
 type Led interface {
