@@ -3,7 +3,8 @@ module github.com/cyrilix/robocar-led
 go 1.13
 
 require (
-	github.com/cyrilix/robocar-base v0.0.0-20191214094302-e5c81519bf31
+	github.com/cyrilix/robocar-base v0.0.0-20191217230653-8d6df473d522
 	github.com/eclipse/paho.mqtt.golang v1.2.0
+	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
 	periph.io/x/periph v3.6.2+incompatible
 )

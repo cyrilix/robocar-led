@@ -41,13 +41,16 @@ func (p *LedPart) Start() error {
 	if err := p.registerCallbacks(); err != nil {
 		return fmt.Errorf("unable to start service: %v", err)
 	}
-	defer p.Stop()
 	for {
 		time.Sleep(1 * time.Hour)
 	}
 }
 
 func (p *LedPart) Stop() {
+	defer p.led.SetBlink(0)
+	defer p.led.SetGreen(0)
+	defer p.led.SetBlue(0)
+	defer p.led.SetRed(0)
 	StopService("led", p.client, p.onDriveModeTopic, p.onRecordTopic)
 }
 

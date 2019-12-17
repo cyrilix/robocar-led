@@ -9,7 +9,7 @@ github.com/containerd/continuity/fs
 github.com/containerd/continuity/pathdriver
 github.com/containerd/continuity/syscallx
 github.com/containerd/continuity/sysx
-# github.com/cyrilix/robocar-base v0.0.0-20191214094302-e5c81519bf31
+# github.com/cyrilix/robocar-base v0.0.0-20191217230653-8d6df473d522
 github.com/cyrilix/robocar-base/cli
 github.com/cyrilix/robocar-base/mode
 github.com/cyrilix/robocar-base/mqttdevice
@@ -83,7 +83,7 @@ github.com/testcontainers/testcontainers-go
 github.com/testcontainers/testcontainers-go/wait
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933
+# golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
 golang.org/x/net/context
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
