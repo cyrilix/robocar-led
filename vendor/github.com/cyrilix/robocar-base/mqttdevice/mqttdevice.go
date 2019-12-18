@@ -96,8 +96,6 @@ func NewMqttValue(v interface{}) MqttValue {
 		return MqttValue(fmt.Sprintf("%0.2f", val))
 	case int, int8, int16, int32, int64:
 		return MqttValue(fmt.Sprintf("%d", val))
-	case mode.DriveMode:
-		return MqttValue(mode.ToString(val))
 	case bool:
 		if val {
 			return []byte("ON")
@@ -129,6 +127,13 @@ func (m *MqttValue) Float64Value() (float64, error) {
 }
 func (m *MqttValue) StringValue() (string, error) {
 	return string(*m), nil
+}
+func (m *MqttValue) DriveModeValue() (mode.DriveMode, error) {
+	val, err := m.IntValue()
+	if err != nil {
+		return mode.DriveModeInvalid, err
+	}
+	return mode.DriveMode(val), nil
 }
 func (m *MqttValue) ByteSliceValue() ([]byte, error) {
 	return *m, nil

@@ -55,10 +55,11 @@ func (p *LedPart) Stop() {
 }
 
 func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
-	mqttValue := mqttdevice.NewMqttValue(message.Payload())
-	m, err := mqttValue.IntValue()
+	payload := message.Payload()
+	value := mqttdevice.NewMqttValue(payload)
+	m, err := value.DriveModeValue()
 	if err != nil {
-		log.Printf("unable to convert message payload '%v' to DriveMode: %v", message.Payload(), err)
+		log.Printf("invalid drive mode: %v", err)
 		return
 	}
 	switch m {
