@@ -2,8 +2,9 @@ package part
 
 import (
 	"fmt"
-	"github.com/cyrilix/robocar-base/mode"
 	"github.com/cyrilix/robocar-base/mqttdevice"
+	"github.com/cyrilix/robocar-base/service"
+	"github.com/cyrilix/robocar-base/types"
 	"github.com/cyrilix/robocar-led/led"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"log"
@@ -18,7 +19,7 @@ func NewPart(client mqtt.Client, driveModeTopic, recordTopic string) *LedPart {
 		onDriveModeTopic: driveModeTopic,
 		onRecordTopic:    recordTopic,
 		muDriveMode:      sync.Mutex{},
-		m:                mode.DriveModeInvalid,
+		m:                types.DriveModeInvalid,
 		muRecord:         sync.Mutex{},
 		recordEnabled:    false,
 	}
@@ -32,7 +33,7 @@ type LedPart struct {
 	onRecordTopic    string
 
 	muDriveMode   sync.Mutex
-	m             mode.DriveMode
+	m             types.DriveMode
 	muRecord      sync.Mutex
 	recordEnabled bool
 }
@@ -51,7 +52,7 @@ func (p *LedPart) Stop() {
 	defer p.led.SetGreen(0)
 	defer p.led.SetBlue(0)
 	defer p.led.SetRed(0)
-	StopService("led", p.client, p.onDriveModeTopic, p.onRecordTopic)
+	service.StopService("led", p.client, p.onDriveModeTopic, p.onRecordTopic)
 }
 
 func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
@@ -63,11 +64,11 @@ func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
 		return
 	}
 	switch m {
-	case mode.DriveModeUser:
+	case types.DriveModeUser:
 		p.led.SetRed(0)
 		p.led.SetGreen(255)
 		p.led.SetBlue(0)
-	case mode.DriveModePilot:
+	case types.DriveModePilot:
 		p.led.SetRed(0)
 		p.led.SetGreen(0)
 		p.led.SetBlue(255)
@@ -89,34 +90,15 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 }
 
 func (p *LedPart) registerCallbacks() error {
-	err := RegisterCallback(p.client, p.onDriveModeTopic, p.onDriveMode)
+	err := service.RegisterCallback(p.client, p.onDriveModeTopic, p.onDriveMode)
 	if err != nil {
 		return err
 	}
 
-	err = RegisterCallback(p.client, p.onRecordTopic, p.onRecord)
+	err = service.RegisterCallback(p.client, p.onRecordTopic, p.onRecord)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func StopService(name string, client mqtt.Client, topics ...string) {
-	log.Printf("Stop %s service", name)
-	token := client.Unsubscribe(topics...)
-	token.Wait()
-	if token.Error() != nil {
-		log.Printf("unable to unsubscribe service: %v", token.Error())
-	}
-	client.Disconnect(50)
-}
-
-func RegisterCallback(client mqtt.Client, topic string, callback mqtt.MessageHandler) error {
-	log.Printf("Register callback on topic %v", topic)
-	token := client.Subscribe(topic, 0, callback)
-	token.Wait()
-	if token.Error() != nil {
-		return fmt.Errorf("unable to register callback on topic %s: %v", topic, token.Error())
-	}
-	return nil
-}

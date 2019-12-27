@@ -1,4 +1,4 @@
-package mode
+package types
 
 import (
 	"log"
@@ -32,6 +32,5 @@ func ParseString(val string) DriveMode {
 	default:
 		log.Printf("invalid DriveMode: %v", val)
 		return DriveModeInvalid
-
 	}
 }
