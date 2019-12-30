@@ -56,13 +56,7 @@ func (p *LedPart) Stop() {
 }
 
 func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
-	payload := message.Payload()
-	value := mqttdevice.NewMqttValue(payload)
-	m, err := value.DriveModeValue()
-	if err != nil {
-		log.Printf("invalid drive mode: %v", err)
-		return
-	}
+	m := types.ParseString(string(message.Payload()))
 	switch m {
 	case types.DriveModeUser:
 		p.led.SetRed(0)

@@ -3,7 +3,6 @@ package part
 import (
 	"github.com/cyrilix/robocar-base/mqttdevice"
 	"github.com/cyrilix/robocar-base/testtools"
-	"github.com/cyrilix/robocar-base/types"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"testing"
 	"time"
@@ -42,9 +41,9 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 		msg              mqtt.Message
 		red, green, blue int
 	}{
-		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue(types.DriveModeUser)), 0, 255, 0},
-		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue(types.DriveModePilot)), 0, 0, 255},
-		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue(types.DriveModeInvalid)), 0, 0, 255},
+		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue("user")), 0, 255, 0},
+		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue("pilot")), 0, 0, 255},
+		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue("invalid")), 0, 0, 255},
 	}
 
 	for _, c := range cases {
