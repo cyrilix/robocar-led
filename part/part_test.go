@@ -3,6 +3,7 @@ package part
 import (
 	"github.com/cyrilix/robocar-base/mqttdevice"
 	"github.com/cyrilix/robocar-base/testtools"
+	"github.com/cyrilix/robocar-protobuf/go/events"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"testing"
 	"time"
@@ -41,9 +42,9 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 		msg              mqtt.Message
 		red, green, blue int
 	}{
-		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue("user")), 0, 255, 0},
-		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue("pilot")), 0, 0, 255},
-		{testtools.NewFakeMessage("drive", mqttdevice.NewMqttValue("invalid")), 0, 0, 255},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_USER}), 0, 255, 0},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_PILOT}), 0, 0, 255},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_INVALID}), 0, 0, 255},
 	}
 
 	for _, c := range cases {
@@ -84,10 +85,10 @@ func TestLedPart_OnRecord(t *testing.T) {
 		record bool
 		blink  bool
 	}{
-		{testtools.NewFakeMessage("record", mqttdevice.NewMqttValue(false)), true, false},
-		{testtools.NewFakeMessage("record", mqttdevice.NewMqttValue(true)), false, true},
-		{testtools.NewFakeMessage("record", mqttdevice.NewMqttValue(false)), true, false},
-		{testtools.NewFakeMessage("record", mqttdevice.NewMqttValue(true)), false, true},
+		{testtools.NewFakeMessageFromProtobuf("record", &events.SwitchRecordMessage{Enabled: false}), true, false},
+		{testtools.NewFakeMessageFromProtobuf("record", &events.SwitchRecordMessage{Enabled: true}), false, true},
+		{testtools.NewFakeMessageFromProtobuf("record", &events.SwitchRecordMessage{Enabled: false}), true, false},
+		{testtools.NewFakeMessageFromProtobuf("record", &events.SwitchRecordMessage{Enabled: true}), false, true},
 	}
 
 	for _, c := range cases {
