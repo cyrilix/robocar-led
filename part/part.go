@@ -81,9 +81,19 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 		log.Errorf("unable to unmarchal %T message: %v", switchRecord, err)
 		return
 	}
+
+	p.muRecord.Lock()
+	defer p.muRecord.Unlock()
+	if p.recordEnabled == switchRecord.GetEnabled() {
+		return
+	}
+	p.recordEnabled = switchRecord.GetEnabled()
+	
 	if switchRecord.GetEnabled() {
+		log.Info("record mode enabled")
 		p.led.SetBlink(2)
 	} else {
+		log.Info("record mode disabled")
 		p.led.SetBlink(0)
 	}
 }
