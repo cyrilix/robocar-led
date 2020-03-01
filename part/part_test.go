@@ -1,10 +1,10 @@
 package part
 
 import (
-	"github.com/cyrilix/robocar-base/mqttdevice"
 	"github.com/cyrilix/robocar-base/testtools"
 	"github.com/cyrilix/robocar-protobuf/go/events"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/golang/protobuf/proto"
 	"testing"
 	"time"
 )
@@ -50,25 +50,22 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 	for _, c := range cases {
 		p.onDriveMode(nil, c.msg)
 		time.Sleep(1 * time.Millisecond)
+		var msg events.DriveModeMessage
+		err := proto.Unmarshal(c.msg.Payload(), &msg)
+		if err != nil {
+			t.Errorf("unable to unmarshal drive mode message: %v", err)
+		}
+		value := msg.DriveMode
 		if led.red != c.red {
-			payload := mqttdevice.NewMqttValue(c.msg.Payload())
-			value, err := payload.IntValue()
-			if err != nil {
-				t.Errorf("payload isn't a led value: %v", err)
-			}
 			t.Errorf("driveMode(%v)=invalid value for red channel: %v, wants %v", value, led.red, c.red)
 		}
 		if led.green != c.green {
-			payload := mqttdevice.NewMqttValue(c.msg.Payload())
-			value, err := payload.IntValue()
 			if err != nil {
 				t.Errorf("payload isn't a led value: %v", err)
 			}
 			t.Errorf("driveMode(%v)=invalid value for green channel: %v, wants %v", value, led.green, c.green)
 		}
 		if led.blue != c.blue {
-			payload := mqttdevice.NewMqttValue(c.msg.Payload())
-			value, err := payload.IntValue()
 			if err != nil {
 				t.Errorf("payload isn't a led value: %v", err)
 			}
@@ -94,11 +91,13 @@ func TestLedPart_OnRecord(t *testing.T) {
 	for _, c := range cases {
 		p.onRecord(nil, c.msg)
 		if led.blink != c.blink {
-			payload := mqttdevice.NewMqttValue(c.msg.Payload())
-			value, err := payload.BoolValue()
+			var msg events.SwitchRecordMessage
+			err := proto.Unmarshal(c.msg.Payload(), &msg)
 			if err != nil {
-				t.Errorf("payload isn't a bool value: %v", err)
+				t.Errorf("unable to unmarshal %T message: %v", msg, err)
 			}
+
+			value := msg.Enabled
 			t.Errorf("onRecord(%v): %v, wants %v", value, c.record, led.blink)
 		}
 	}

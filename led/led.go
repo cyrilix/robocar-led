@@ -1,7 +1,7 @@
 package led
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/host"
 	"periph.io/x/periph/host/bcm283x"
@@ -111,7 +111,7 @@ func (l *PiColorLed) blink(freq float64) {
 			green = tmpG
 			blue = tmpB
 		}
-
+		log.Infof("factor: %v", factor)
 		l.SetRed(red * factor)
 		l.SetGreen(green * factor)
 		l.SetBlue(blue * factor)
@@ -133,7 +133,7 @@ var setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 	}
 	err := led.Out(lvl)
 	if err != nil {
-		log.Printf("unable to sed pin to %v: %v", lvl, err)
+		log.Errorf("unable to sed pin to %v: %v", lvl, err)
 	}
 }
 
