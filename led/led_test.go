@@ -1,7 +1,7 @@
 package led
 
 import (
-	"periph.io/x/periph/conn/gpio"
+	"periph.io/x/conn/v3/gpio"
 	"sync"
 	"testing"
 	"time"

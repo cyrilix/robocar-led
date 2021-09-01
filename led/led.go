@@ -2,9 +2,9 @@ package led
 
 import (
 	log "github.com/sirupsen/logrus"
-	"periph.io/x/periph/conn/gpio"
-	"periph.io/x/periph/host"
-	"periph.io/x/periph/host/bcm283x"
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/host/v3"
+	"periph.io/x/host/v3/bcm283x"
 	"sync"
 	"time"
 )

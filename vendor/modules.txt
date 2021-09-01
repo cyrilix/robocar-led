@@ -60,34 +60,41 @@ google.golang.org/protobuf/runtime/protoiface
 google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/descriptorpb
 google.golang.org/protobuf/types/known/timestamppb
-# periph.io/x/periph v3.6.8+incompatible
-## explicit
-periph.io/x/periph
-periph.io/x/periph/conn
-periph.io/x/periph/conn/gpio
-periph.io/x/periph/conn/gpio/gpioreg
-periph.io/x/periph/conn/gpio/gpiostream
-periph.io/x/periph/conn/i2c
-periph.io/x/periph/conn/i2c/i2creg
-periph.io/x/periph/conn/physic
-periph.io/x/periph/conn/pin
-periph.io/x/periph/conn/pin/pinreg
-periph.io/x/periph/conn/spi
-periph.io/x/periph/conn/spi/spireg
-periph.io/x/periph/host
-periph.io/x/periph/host/allwinner
-periph.io/x/periph/host/am335x
-periph.io/x/periph/host/bcm283x
-periph.io/x/periph/host/beagle/black
-periph.io/x/periph/host/beagle/bone
-periph.io/x/periph/host/beagle/green
-periph.io/x/periph/host/chip
-periph.io/x/periph/host/cpu
-periph.io/x/periph/host/distro
-periph.io/x/periph/host/fs
-periph.io/x/periph/host/odroidc1
-periph.io/x/periph/host/pine64
-periph.io/x/periph/host/pmem
-periph.io/x/periph/host/rpi
-periph.io/x/periph/host/sysfs
-periph.io/x/periph/host/videocore
+# periph.io/x/conn/v3 v3.6.8
+## explicit; go 1.13
+periph.io/x/conn/v3
+periph.io/x/conn/v3/driver
+periph.io/x/conn/v3/driver/driverreg
+periph.io/x/conn/v3/gpio
+periph.io/x/conn/v3/gpio/gpioreg
+periph.io/x/conn/v3/gpio/gpiostream
+periph.io/x/conn/v3/i2c
+periph.io/x/conn/v3/i2c/i2creg
+periph.io/x/conn/v3/physic
+periph.io/x/conn/v3/pin
+periph.io/x/conn/v3/pin/pinreg
+periph.io/x/conn/v3/spi
+periph.io/x/conn/v3/spi/spireg
+# periph.io/x/d2xx v0.0.1
+## explicit; go 1.13
+periph.io/x/d2xx
+# periph.io/x/host/v3 v3.7.0
+## explicit; go 1.13
+periph.io/x/host/v3
+periph.io/x/host/v3/allwinner
+periph.io/x/host/v3/am335x
+periph.io/x/host/v3/bcm283x
+periph.io/x/host/v3/beagle/black
+periph.io/x/host/v3/beagle/bone
+periph.io/x/host/v3/beagle/green
+periph.io/x/host/v3/chip
+periph.io/x/host/v3/cpu
+periph.io/x/host/v3/distro
+periph.io/x/host/v3/fs
+periph.io/x/host/v3/ftdi
+periph.io/x/host/v3/odroidc1
+periph.io/x/host/v3/pine64
+periph.io/x/host/v3/pmem
+periph.io/x/host/v3/rpi
+periph.io/x/host/v3/sysfs
+periph.io/x/host/v3/videocore
