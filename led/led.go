@@ -4,7 +4,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/host/v3"
-	"periph.io/x/host/v3/bcm283x"
+	"periph.io/x/host/v3/rpi"
 	"sync"
 	"time"
 )
@@ -19,9 +19,9 @@ func init() {
 
 func New() *PiColorLed {
 	led := PiColorLed{
-		pinRed:          bcm283x.GPIO23,
-		pinGreen:        bcm283x.GPIO24,
-		pinBlue:         bcm283x.GPIO25,
+		pinRed:          rpi.P1_16,
+		pinGreen:        rpi.P1_18,
+		pinBlue:         rpi.P1_22,
 		redValue:        0,
 		greenValue:      0,
 		blueValue:       0,

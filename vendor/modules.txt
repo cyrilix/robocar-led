@@ -75,7 +75,7 @@ periph.io/x/conn/v3/pin
 periph.io/x/conn/v3/pin/pinreg
 periph.io/x/conn/v3/spi
 periph.io/x/conn/v3/spi/spireg
-# periph.io/x/d2xx v0.0.1
+# periph.io/x/d2xx v0.0.3
 ## explicit; go 1.13
 periph.io/x/d2xx
 # periph.io/x/host/v3 v3.7.0

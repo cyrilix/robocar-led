@@ -18,5 +18,5 @@ require (
 	golang.org/x/net v0.0.0-20200425230154-ff2c4b7c35a0 // indirect
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
-	periph.io/x/d2xx v0.0.1 // indirect
+	periph.io/x/d2xx v0.0.3 // indirect
 )
