@@ -7,7 +7,7 @@ import (
 	"github.com/cyrilix/robocar-protobuf/go/events"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/golang/protobuf/proto"
-	log "github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"sync"
 	"time"
 )
@@ -59,7 +59,7 @@ func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
 	var driveModeMessage events.DriveModeMessage
 	err := proto.Unmarshal(message.Payload(), &driveModeMessage)
 	if err != nil {
-		log.Errorf("unable to unmarchal %T message: %v", driveModeMessage, err)
+		zap.S().Errorf("unable to unmarshal %T message: %v", driveModeMessage, err)
 		return
 	}
 	switch driveModeMessage.GetDriveMode() {
@@ -78,7 +78,7 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 	var switchRecord events.SwitchRecordMessage
 	err := proto.Unmarshal(message.Payload(), &switchRecord)
 	if err != nil {
-		log.Errorf("unable to unmarchal %T message: %v", switchRecord, err)
+		zap.S().Errorf("unable to unmarchal %T message: %v", switchRecord, err)
 		return
 	}
 
@@ -90,10 +90,10 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 	p.recordEnabled = switchRecord.GetEnabled()
 	
 	if switchRecord.GetEnabled() {
-		log.Info("record mode enabled")
+		zap.S().Info("record mode enabled")
 		p.led.SetBlink(2)
 	} else {
-		log.Info("record mode disabled")
+		zap.S().Info("record mode disabled")
 		p.led.SetBlink(0)
 	}
 }

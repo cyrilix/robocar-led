@@ -1,7 +1,7 @@
 package led
 
 import (
-	log "github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"periph.io/x/conn/v3/gpio"
 	"periph.io/x/host/v3"
 	"periph.io/x/host/v3/rpi"
@@ -10,9 +10,10 @@ import (
 )
 
 func init() {
+	zap.S().Info("init pin")
 	// Load all the drivers:
 	if _, err := host.Init(); err != nil {
-		log.Fatal(err)
+		zap.S().Fatalf("unable to init host driver: %v", err)
 	}
 
 }
@@ -111,7 +112,7 @@ func (l *PiColorLed) blink(freq float64) {
 			green = tmpG
 			blue = tmpB
 		}
-		log.Infof("factor: %v", factor)
+		zap.S().Debugf("factor: %v", factor)
 		l.SetRed(red * factor)
 		l.SetGreen(green * factor)
 		l.SetBlue(blue * factor)
@@ -133,7 +134,7 @@ var setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 	}
 	err := led.Out(lvl)
 	if err != nil {
-		log.Errorf("unable to sed pin to %v: %v", lvl, err)
+		zap.S().Errorf("unable to sed pin to %v: %v", lvl, err)
 	}
 }
 
