@@ -71,14 +71,27 @@ type PiColorLed struct {
 func (l *PiColorLed) SetColor(color Color) {
 	l.muColorValue.Lock()
 	defer l.muColorValue.Unlock()
+	if color == l.currentColor {
+		return
+	}
+	l.currentColor = color
 	setLed(color.Red, l.pinRed, &l.muPinRed)
 	setLed(color.Green, l.pinGreen, &l.muPinGreen)
 	setLed(color.Blue, l.pinBlue, &l.muPinBlue)
 }
 
+func (l *PiColorLed) on() {
+	l.muColorValue.RLock()
+	defer l.muColorValue.RUnlock()
+
+	setLed(l.currentColor.Red, l.pinRed, &l.muPinRed)
+	setLed(l.currentColor.Green, l.pinGreen, &l.muPinGreen)
+	setLed(l.currentColor.Blue, l.pinBlue, &l.muPinBlue)
+}
 func (l *PiColorLed) off() {
-	l.muColorValue.Lock()
-	defer l.muColorValue.Unlock()
+	l.muColorValue.RLock()
+	defer l.muColorValue.RUnlock()
+
 	setLed(0, l.pinRed, &l.muPinRed)
 	setLed(0, l.pinGreen, &l.muPinGreen)
 	setLed(0, l.pinBlue, &l.muPinBlue)
@@ -101,27 +114,30 @@ func (l *PiColorLed) SetBlink(freq float64) {
 }
 
 func (l *PiColorLed) blink(freq float64) {
+	log := zap.S().With("func", "blink")
 	ticker := time.NewTicker(time.Duration(float64(time.Second) / freq))
+
+	// Restore values
+	defer l.SetColor(l.Color())
 
 	for {
 		select {
 		case <-ticker.C:
 		case <-l.cancelBlinkChan:
-			// Restore values
-			l.SetColor(l.Color())
 			return
 		}
+		log.Debugf("off with color %v", ColorBlack)
 		l.off()
 
 		select {
 		case <-ticker.C:
 		case <-l.cancelBlinkChan:
-			// Restore values
-			l.SetColor(l.Color())
 			return
 		}
-		l.SetColor(l.Color())
+		log.Debugf("on with color %v", l.Color())
+		l.on()
 	}
+
 }
 
 var setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
