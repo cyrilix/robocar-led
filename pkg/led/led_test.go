@@ -26,7 +26,7 @@ func TestColorLed_Red(t *testing.T) {
 		t.Errorf("colorValue: %v, wants %v", colorValue, 0)
 	}
 
-	l.SetRed(255)
+	l.SetColor(ColorRed)
 	if l.Red() != 255 {
 		t.Errorf("%T.Red(): %v, wants %v", l, l.Red(), 255)
 	}
@@ -54,7 +54,7 @@ func TestColorLed_Green(t *testing.T) {
 		t.Errorf("colorValue: %v, wants %v", colorValue, 0)
 	}
 
-	l.SetGreen(255)
+	l.SetColor(ColorGreen)
 	if l.Green() != 255 {
 		t.Errorf("%T.Green(): %v, wants %v", l, l.Green(), 255)
 	}
@@ -82,7 +82,7 @@ func TestColorLed_Blue(t *testing.T) {
 		t.Errorf("colorValue: %v, wants %v", colorValue, 0)
 	}
 
-	l.SetBlue(255)
+	l.SetColor(ColorBlue)
 	if l.Blue() != 255 {
 		t.Errorf("%T.Blue(): %v, wants %v", l, l.Blue(), 255)
 	}
@@ -111,7 +111,7 @@ func TestColorLed_SetBlink(t *testing.T) {
 	}
 
 	l := New()
-	l.SetBlue(255)
+	l.SetColor(ColorBlue)
 	v := readValue()
 	if v != 255 {
 		t.Errorf("colorValue: %v, wants %v", v, 255)
@@ -171,14 +171,14 @@ func TestColorLed_SetBlinkAndUpdadeColor(t *testing.T) {
 	}
 
 	l := New()
-	l.SetBlue(255)
+	l.SetColor(ColorBlue)
 	l.SetBlink(100)
 	v := readValue()
 	if v != 255 {
 		t.Errorf("colorValue: %v, wants %v", v, 255)
 	}
 	time.Sleep(6 * time.Millisecond)
-	l.SetBlue(128)
+	l.SetColor(ColorBlue)
 
 	v = readValue()
 	if v != 128 {

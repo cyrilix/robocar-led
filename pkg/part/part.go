@@ -27,8 +27,8 @@ func NewPart(client mqtt.Client, driveModeTopic, recordTopic string) *LedPart {
 }
 
 type LedPart struct {
-	led    led.ColoredLed
-	client mqtt.Client
+	led              led.ColoredLed
+	client           mqtt.Client
 	onDriveModeTopic string
 	onRecordTopic    string
 
@@ -49,9 +49,7 @@ func (p *LedPart) Start() error {
 
 func (p *LedPart) Stop() {
 	defer p.led.SetBlink(0)
-	defer p.led.SetGreen(0)
-	defer p.led.SetBlue(0)
-	defer p.led.SetRed(0)
+	defer p.led.SetColor(led.ColorBlack)
 	service.StopService("led", p.client, p.onDriveModeTopic, p.onRecordTopic)
 }
 
@@ -64,13 +62,9 @@ func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
 	}
 	switch driveModeMessage.GetDriveMode() {
 	case events.DriveMode_USER:
-		p.led.SetRed(0)
-		p.led.SetGreen(255)
-		p.led.SetBlue(0)
+		p.led.SetColor(led.ColorGreen)
 	case events.DriveMode_PILOT:
-		p.led.SetRed(0)
-		p.led.SetGreen(0)
-		p.led.SetBlue(255)
+		p.led.SetColor(led.ColorBlue)
 	}
 }
 
@@ -88,7 +82,7 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 		return
 	}
 	p.recordEnabled = switchRecord.GetEnabled()
-	
+
 	if switchRecord.GetEnabled() {
 		zap.S().Info("record mode enabled")
 		p.led.SetBlink(2)

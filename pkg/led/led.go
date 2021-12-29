@@ -18,18 +18,30 @@ func init() {
 
 }
 
+var (
+	ColorBlack = Color{0, 0, 0}
+	ColorRed   = Color{255, 0, 0}
+	ColorGreen = Color{0, 255, 0}
+	ColorBlue  = Color{0, 0, 255}
+)
+
 func New() *PiColorLed {
 	led := PiColorLed{
 		pinRed:          rpi.P1_16,
 		pinGreen:        rpi.P1_18,
 		pinBlue:         rpi.P1_22,
-		redValue:        0,
-		greenValue:      0,
-		blueValue:       0,
+		currentColor:    ColorBlack,
 		cancelBlinkChan: make(chan interface{}),
 		blinkEnabled:    false,
 	}
+
 	return &led
+}
+
+type Color struct {
+	Red   int
+	Green int
+	Blue  int
 }
 
 type Led interface {
@@ -38,9 +50,7 @@ type Led interface {
 
 type ColoredLed interface {
 	Led
-	SetRed(value int)
-	SetGreen(value int)
-	SetBlue(value int)
+	SetColor(color Color)
 }
 
 type PiColorLed struct {
@@ -49,13 +59,29 @@ type PiColorLed struct {
 	pinGreen                        gpio.PinIO
 	pinBlue                         gpio.PinIO
 
-	muColorValue                    sync.RWMutex
-	redValue, greenValue, blueValue int
+	muColorValue sync.RWMutex
+	currentColor Color
 
 	cancelBlinkChan chan interface{}
 
 	muBlink      sync.Mutex
 	blinkEnabled bool
+}
+
+func (l *PiColorLed) SetColor(color Color) {
+	l.muColorValue.Lock()
+	defer l.muColorValue.Unlock()
+	setLed(color.Red, l.pinRed, &l.muPinRed)
+	setLed(color.Green, l.pinGreen, &l.muPinGreen)
+	setLed(color.Blue, l.pinBlue, &l.muPinBlue)
+}
+
+func (l *PiColorLed) off() {
+	l.muColorValue.Lock()
+	defer l.muColorValue.Unlock()
+	setLed(0, l.pinRed, &l.muPinRed)
+	setLed(0, l.pinGreen, &l.muPinGreen)
+	setLed(0, l.pinBlue, &l.muPinBlue)
 }
 
 func (l *PiColorLed) SetBlink(freq float64) {
@@ -75,53 +101,26 @@ func (l *PiColorLed) SetBlink(freq float64) {
 }
 
 func (l *PiColorLed) blink(freq float64) {
-	factor := 0
 	ticker := time.NewTicker(time.Duration(float64(time.Second) / freq))
-	red := l.Red()
-	green := l.Green()
-	blue := l.Blue()
-	var tmpR, tmpG, tmpB int
+
 	for {
 		select {
 		case <-ticker.C:
 		case <-l.cancelBlinkChan:
 			// Restore values
-			l.SetRed(red)
-			l.SetGreen(green)
-			l.SetBlue(blue)
+			l.SetColor(l.Color())
 			return
 		}
+		l.off()
 
-		tmpR = l.Red()
-		tmpG = l.Green()
-		tmpB = l.Blue()
-		if factor == 1 {
-			// Led is off
-			if tmpR > 0 {
-				red = tmpR
-			}
-			if tmpG > 0 {
-				green = tmpG
-			}
-			if tmpB > 0 {
-				blue = tmpB
-			}
-		} else {
-			// Led on: get updated value
-			red = tmpR
-			green = tmpG
-			blue = tmpB
+		select {
+		case <-ticker.C:
+		case <-l.cancelBlinkChan:
+			// Restore values
+			l.SetColor(l.Color())
+			return
 		}
-		zap.S().Debugf("factor: %v", factor)
-		l.SetRed(red * factor)
-		l.SetGreen(green * factor)
-		l.SetBlue(blue * factor)
-
-		if factor == 0 {
-			factor = 1
-		} else {
-			factor = 0
-		}
+		l.SetColor(l.Color())
 	}
 }
 
@@ -141,35 +140,23 @@ var setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 func (l *PiColorLed) Red() int {
 	l.muColorValue.RLock()
 	defer l.muColorValue.RUnlock()
-	return l.redValue
-}
-func (l *PiColorLed) SetRed(v int) {
-	setLed(v, l.pinRed, &l.muPinRed)
-	l.muColorValue.Lock()
-	defer l.muColorValue.Unlock()
-	l.redValue = v
+	return l.currentColor.Red
 }
 
 func (l *PiColorLed) Green() int {
 	l.muColorValue.RLock()
 	defer l.muColorValue.RUnlock()
-	return l.greenValue
-}
-func (l *PiColorLed) SetGreen(v int) {
-	setLed(v, l.pinGreen, &l.muPinGreen)
-	l.muColorValue.Lock()
-	defer l.muColorValue.Unlock()
-	l.greenValue = v
+	return l.currentColor.Green
 }
 
 func (l *PiColorLed) Blue() int {
 	l.muColorValue.RLock()
 	defer l.muColorValue.RUnlock()
-	return l.blueValue
+	return l.currentColor.Blue
 }
-func (l *PiColorLed) SetBlue(v int) {
-	setLed(v, l.pinBlue, &l.muPinBlue)
-	l.muColorValue.Lock()
-	defer l.muColorValue.Unlock()
-	l.blueValue = v
+
+func (l *PiColorLed) Color() Color {
+	l.muColorValue.RLock()
+	defer l.muColorValue.RUnlock()
+	return l.currentColor
 }
