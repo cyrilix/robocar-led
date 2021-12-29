@@ -85,7 +85,7 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 
 	if switchRecord.GetEnabled() {
 		zap.S().Info("record mode enabled")
-		p.led.SetBlink(2)
+		p.led.SetBlink(0.5)
 	} else {
 		zap.S().Info("record mode disabled")
 		p.led.SetBlink(0)
