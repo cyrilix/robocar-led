@@ -35,7 +35,7 @@ go.uber.org/zap/zapcore
 ## explicit; go 1.11
 golang.org/x/net/internal/socks
 golang.org/x/net/proxy
-# google.golang.org/protobuf v1.26.0
+# google.golang.org/protobuf v1.27.1
 ## explicit; go 1.9
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
