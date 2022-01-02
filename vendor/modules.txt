@@ -65,7 +65,7 @@ google.golang.org/protobuf/runtime/protoiface
 google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/descriptorpb
 google.golang.org/protobuf/types/known/timestamppb
-# periph.io/x/conn/v3 v3.6.8
+# periph.io/x/conn/v3 v3.6.10
 ## explicit; go 1.13
 periph.io/x/conn/v3
 periph.io/x/conn/v3/driver
@@ -80,10 +80,7 @@ periph.io/x/conn/v3/pin
 periph.io/x/conn/v3/pin/pinreg
 periph.io/x/conn/v3/spi
 periph.io/x/conn/v3/spi/spireg
-# periph.io/x/d2xx v0.0.3
-## explicit; go 1.13
-periph.io/x/d2xx
-# periph.io/x/host/v3 v3.7.0
+# periph.io/x/host/v3 v3.7.2
 ## explicit; go 1.13
 periph.io/x/host/v3
 periph.io/x/host/v3/allwinner
@@ -96,7 +93,6 @@ periph.io/x/host/v3/chip
 periph.io/x/host/v3/cpu
 periph.io/x/host/v3/distro
 periph.io/x/host/v3/fs
-periph.io/x/host/v3/ftdi
 periph.io/x/host/v3/odroidc1
 periph.io/x/host/v3/pine64
 periph.io/x/host/v3/pmem
