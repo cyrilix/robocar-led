@@ -118,7 +118,7 @@ func (l *PiColorLed) blink(freq float64) {
 	ticker := time.NewTicker(time.Duration(float64(time.Second) / freq))
 
 	// Restore values
-	defer l.SetColor(l.Color())
+	defer l.on()
 
 	for {
 		select {
