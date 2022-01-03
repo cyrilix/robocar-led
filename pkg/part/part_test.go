@@ -2,6 +2,7 @@ package part
 
 import (
 	"github.com/cyrilix/robocar-base/testtools"
+	"github.com/cyrilix/robocar-led/pkg/led"
 	"github.com/cyrilix/robocar-protobuf/go/events"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/golang/protobuf/proto"
@@ -10,8 +11,12 @@ import (
 )
 
 type fakeLed struct {
-	red, green, blue int
-	blink            bool
+	color led.Color
+	blink bool
+}
+
+func (f *fakeLed) SetColor(color led.Color) {
+	f.color = color
 }
 
 func (f *fakeLed) SetBlink(freq float64) {
@@ -22,29 +27,17 @@ func (f *fakeLed) SetBlink(freq float64) {
 	}
 }
 
-func (f *fakeLed) SetRed(value int) {
-	f.red = value
-}
-
-func (f *fakeLed) SetGreen(value int) {
-	f.green = value
-}
-
-func (f *fakeLed) SetBlue(value int) {
-	f.blue = value
-}
-
 func TestLedPart_OnDriveMode(t *testing.T) {
-	led := fakeLed{}
-	p := LedPart{led: &led}
+	l := fakeLed{}
+	p := LedPart{led: &l}
 
 	cases := []struct {
-		msg              mqtt.Message
-		red, green, blue int
+		msg   mqtt.Message
+		color led.Color
 	}{
-		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_USER}), 0, 255, 0},
-		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_PILOT}), 0, 0, 255},
-		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_INVALID}), 0, 0, 255},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_USER}), led.ColorGreen},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_PILOT}), led.ColorBlue},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_INVALID}), led.ColorBlue},
 	}
 
 	for _, c := range cases {
@@ -56,20 +49,8 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 			t.Errorf("unable to unmarshal drive mode message: %v", err)
 		}
 		value := msg.DriveMode
-		if led.red != c.red {
-			t.Errorf("driveMode(%v)=invalid value for red channel: %v, wants %v", value, led.red, c.red)
-		}
-		if led.green != c.green {
-			if err != nil {
-				t.Errorf("payload isn't a led value: %v", err)
-			}
-			t.Errorf("driveMode(%v)=invalid value for green channel: %v, wants %v", value, led.green, c.green)
-		}
-		if led.blue != c.blue {
-			if err != nil {
-				t.Errorf("payload isn't a led value: %v", err)
-			}
-			t.Errorf("driveMode(%v)=invalid value for blue channel: %v, wants %v", value, led.blue, c.blue)
+		if l.color != c.color {
+			t.Errorf("driveMode(%v)=invalid value for color: %v, wants %v", value, l.color, c.color)
 		}
 	}
 }
