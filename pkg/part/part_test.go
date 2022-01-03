@@ -5,7 +5,7 @@ import (
 	"github.com/cyrilix/robocar-led/pkg/led"
 	"github.com/cyrilix/robocar-protobuf/go/events"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"testing"
 	"time"
 )
