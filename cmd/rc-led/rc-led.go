@@ -15,7 +15,7 @@ const (
 
 func main() {
 	var mqttBroker, username, password, clientId string
-	var driveModeTopic, recordTopic string
+	var driveModeTopic, recordTopic, speedZoneTopic string
 
 	mqttQos := cli.InitIntFlag("MQTT_QOS", 0)
 	_, mqttRetain := os.LookupEnv("MQTT_RETAIN")
@@ -24,6 +24,7 @@ func main() {
 
 	flag.StringVar(&driveModeTopic, "mqtt-topic-drive-mode", os.Getenv("MQTT_TOPIC_DRIVE_MODE"), "Mqtt topic that contains DriveMode value, use MQTT_TOPIC_DRIVE_MODE if args not set")
 	flag.StringVar(&recordTopic, "mqtt-topic-record", os.Getenv("MQTT_TOPIC_RECORD"), "Mqtt topic that contains video recording state, use MQTT_TOPIC_RECORD if args not set")
+	flag.StringVar(&speedZoneTopic, "mqtt-topic-speed-zone", os.Getenv("MQTT_TOPIC_SPEED_ZONE"), "Mqtt topic that contains speed zone, use MQTT_TOPIC_SPEED_ZONE if args not set")
 
 	logLevel := zap.LevelFlag("log", zap.InfoLevel, "log level")
 	flag.Parse()
@@ -52,7 +53,7 @@ func main() {
 	}
 	defer client.Disconnect(50)
 
-	p := part.NewPart(client, driveModeTopic, recordTopic)
+	p := part.NewPart(client, driveModeTopic, recordTopic, speedZoneTopic)
 	defer p.Stop()
 
 	cli.HandleExit(p)

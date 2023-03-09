@@ -12,16 +12,19 @@ import (
 	"time"
 )
 
-func NewPart(client mqtt.Client, driveModeTopic, recordTopic string) *LedPart {
+func NewPart(client mqtt.Client, driveModeTopic, recordTopic, speedZoneTopic string) *LedPart {
 	return &LedPart{
 		led:              led.New(),
 		client:           client,
 		onDriveModeTopic: driveModeTopic,
 		onRecordTopic:    recordTopic,
+		onSpeedZoneTopic: speedZoneTopic,
 		muDriveMode:      sync.Mutex{},
-		m:                events.DriveMode_INVALID,
+		driveMode:        events.DriveMode_INVALID,
 		muRecord:         sync.Mutex{},
 		recordEnabled:    false,
+		muSpeedZone:      sync.Mutex{},
+		speedZone:        events.SpeedZone_UNKNOWN,
 	}
 
 }
@@ -31,11 +34,15 @@ type LedPart struct {
 	client           mqtt.Client
 	onDriveModeTopic string
 	onRecordTopic    string
+	onSpeedZoneTopic string
 
 	muDriveMode   sync.Mutex
-	m             events.DriveMode
+	driveMode     events.DriveMode
 	muRecord      sync.Mutex
 	recordEnabled bool
+
+	muSpeedZone sync.Mutex
+	speedZone   events.SpeedZone
 }
 
 func (p *LedPart) Start() error {
@@ -50,7 +57,13 @@ func (p *LedPart) Start() error {
 func (p *LedPart) Stop() {
 	defer p.led.SetBlink(0)
 	defer p.led.SetColor(led.ColorBlack)
-	service.StopService("led", p.client, p.onDriveModeTopic, p.onRecordTopic)
+	service.StopService("led", p.client, p.onDriveModeTopic, p.onRecordTopic, p.onSpeedZoneTopic)
+}
+
+func (p *LedPart) setDriveMode(m events.DriveMode) {
+	p.muDriveMode.Lock()
+	defer p.muDriveMode.Unlock()
+	p.driveMode = m
 }
 
 func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
@@ -60,12 +73,8 @@ func (p *LedPart) onDriveMode(_ mqtt.Client, message mqtt.Message) {
 		zap.S().Errorf("unable to unmarshal %T message: %v", driveModeMessage, err)
 		return
 	}
-	switch driveModeMessage.GetDriveMode() {
-	case events.DriveMode_USER:
-		p.led.SetColor(led.ColorGreen)
-	case events.DriveMode_PILOT:
-		p.led.SetColor(led.ColorBlue)
-	}
+	p.setDriveMode(driveModeMessage.GetDriveMode())
+	p.updateColor()
 }
 
 func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
@@ -92,6 +101,47 @@ func (p *LedPart) onRecord(client mqtt.Client, message mqtt.Message) {
 	}
 }
 
+func (p *LedPart) setSpeedZone(sz events.SpeedZone) {
+	p.muSpeedZone.Lock()
+	defer p.muSpeedZone.Unlock()
+	p.speedZone = sz
+}
+
+func (p *LedPart) onSpeedZone(_ mqtt.Client, message mqtt.Message) {
+	var speedZoneMessage events.SpeedZoneMessage
+	err := proto.Unmarshal(message.Payload(), &speedZoneMessage)
+	if err != nil {
+		zap.S().Errorf("unable to unmarshal %T message: %v", speedZoneMessage, err)
+		return
+	}
+
+	p.setSpeedZone(speedZoneMessage.GetSpeedZone())
+	p.updateColor()
+}
+
+func (p *LedPart) updateColor() {
+	p.muSpeedZone.Lock()
+	defer p.muSpeedZone.Unlock()
+	p.muDriveMode.Lock()
+	defer p.muDriveMode.Unlock()
+
+	switch p.driveMode {
+	case events.DriveMode_USER:
+		p.led.SetColor(led.ColorGreen)
+	case events.DriveMode_PILOT:
+		switch p.speedZone {
+		case events.SpeedZone_UNKNOWN:
+			p.led.SetColor(led.ColorWhite)
+		case events.SpeedZone_SLOW:
+			p.led.SetColor(led.ColorRed)
+		case events.SpeedZone_NORMAL:
+			p.led.SetColor(led.ColorYellow)
+		case events.SpeedZone_FAST:
+			p.led.SetColor(led.ColorBlue)
+		}
+	}
+}
+
 func (p *LedPart) registerCallbacks() error {
 	err := service.RegisterCallback(p.client, p.onDriveModeTopic, p.onDriveMode)
 	if err != nil {
@@ -102,5 +152,11 @@ func (p *LedPart) registerCallbacks() error {
 	if err != nil {
 		return err
 	}
+
+	err = service.RegisterCallback(p.client, p.onSpeedZoneTopic, p.onSpeedZone)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

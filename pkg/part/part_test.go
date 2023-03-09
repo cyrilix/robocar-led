@@ -29,7 +29,7 @@ func (f *fakeLed) SetBlink(freq float64) {
 
 func TestLedPart_OnDriveMode(t *testing.T) {
 	l := fakeLed{}
-	p := LedPart{led: &l}
+	p := LedPart{led: &l, speedZone: events.SpeedZone_FAST}
 
 	cases := []struct {
 		msg   mqtt.Message
@@ -54,6 +54,7 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 		}
 	}
 }
+
 func TestLedPart_OnRecord(t *testing.T) {
 	led := fakeLed{}
 	p := LedPart{led: &led}
@@ -80,6 +81,35 @@ func TestLedPart_OnRecord(t *testing.T) {
 
 			value := msg.Enabled
 			t.Errorf("onRecord(%v): %v, wants %v", value, c.record, led.blink)
+		}
+	}
+}
+
+func TestLedPart_OnSpeedZone(t *testing.T) {
+	l := fakeLed{}
+	p := LedPart{led: &l, driveMode: events.DriveMode_PILOT}
+
+	cases := []struct {
+		msg   mqtt.Message
+		color led.Color
+	}{
+		{testtools.NewFakeMessageFromProtobuf("speedzone", &events.SpeedZoneMessage{SpeedZone: events.SpeedZone_SLOW}), led.ColorRed},
+		{testtools.NewFakeMessageFromProtobuf("speedzone", &events.SpeedZoneMessage{SpeedZone: events.SpeedZone_NORMAL}), led.ColorYellow},
+		{testtools.NewFakeMessageFromProtobuf("speedzone", &events.SpeedZoneMessage{SpeedZone: events.SpeedZone_FAST}), led.ColorBlue},
+		{testtools.NewFakeMessageFromProtobuf("speedzone", &events.SpeedZoneMessage{SpeedZone: events.SpeedZone_UNKNOWN}), led.ColorWhite},
+	}
+
+	for _, c := range cases {
+		p.onSpeedZone(nil, c.msg)
+		time.Sleep(1 * time.Millisecond)
+		var msg events.SpeedZoneMessage
+		err := proto.Unmarshal(c.msg.Payload(), &msg)
+		if err != nil {
+			t.Errorf("unable to unmarshal drive mode message: %v", err)
+		}
+		value := msg.GetSpeedZone()
+		if l.color != c.color {
+			t.Errorf("driveMode(%v)=invalid value for color: %v, wants %v", value, l.color, c.color)
 		}
 	}
 }

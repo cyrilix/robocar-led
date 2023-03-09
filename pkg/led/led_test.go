@@ -11,27 +11,38 @@ func TestColorLed_Red(t *testing.T) {
 	setLedBackup := setLed
 	defer func() { setLed = setLedBackup }()
 
-	ledColors := make(map[gpio.PinIO]int)
+	l := New()
+	fakeLed := struct {
+		redValue   int
+		greenValue int
+		blueValue  int
+	}{}
 	setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 		mutex.Lock()
 		defer mutex.Unlock()
-		ledColors[led] = v
+		switch led {
+		case l.pinRed:
+			fakeLed.redValue = v
+		case l.pinGreen:
+			fakeLed.greenValue = v
+		case l.pinBlue:
+			fakeLed.blueValue = v
+		}
 	}
 
-	l := New()
 	if l.Red() != 0 {
 		t.Errorf("%T.Red(): %v, wants %v", l, l.Red(), 0)
 	}
-	if ledColors[l.pinRed] != 0 {
-		t.Errorf("colorValue: %v, wants %v", ledColors[l.pinRed], 0)
+	if fakeLed.redValue != 0 {
+		t.Errorf("colorValue: %v, wants %v", fakeLed.redValue, 0)
 	}
 
 	l.SetColor(ColorRed)
 	if l.Red() != 255 {
 		t.Errorf("%T.Red(): %v, wants %v", l, l.Red(), 255)
 	}
-	if ledColors[l.pinRed] != 255 {
-		t.Errorf("colorValue: %v, wants %v", ledColors[l.pinRed], 255)
+	if fakeLed.redValue != 255 {
+		t.Errorf("colorValue: %v, wants %v", fakeLed.redValue, 255)
 	}
 }
 
@@ -39,27 +50,38 @@ func TestColorLed_Green(t *testing.T) {
 	setLedBackup := setLed
 	defer func() { setLed = setLedBackup }()
 
-	ledColors := make(map[gpio.PinIO]int)
+	l := New()
+	fakeLed := struct {
+		redValue   int
+		greenValue int
+		blueValue  int
+	}{}
 	setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 		mutex.Lock()
 		defer mutex.Unlock()
-		ledColors[led] = v
+		switch led {
+		case l.pinRed:
+			fakeLed.redValue = v
+		case l.pinGreen:
+			fakeLed.greenValue = v
+		case l.pinBlue:
+			fakeLed.blueValue = v
+		}
 	}
 
-	l := New()
 	if l.Green() != 0 {
 		t.Errorf("%T.Green(): %v, wants %v", l, l.Green(), 0)
 	}
-	if ledColors[l.pinGreen] != 0 {
-		t.Errorf("colorValue: %v, wants %v", ledColors[l.pinGreen], 0)
+	if fakeLed.greenValue != 0 {
+		t.Errorf("colorValue: %v, wants %v", fakeLed.greenValue, 0)
 	}
 
 	l.SetColor(ColorGreen)
 	if l.Green() != 255 {
 		t.Errorf("%T.Green(): %v, wants %v", l, l.Green(), 255)
 	}
-	if ledColors[l.pinGreen] != 255 {
-		t.Errorf("colorValue: %v, wants %v", ledColors[l.pinGreen], 255)
+	if fakeLed.greenValue != 255 {
+		t.Errorf("colorValue: %v, wants %v", fakeLed.greenValue, 255)
 	}
 }
 
@@ -67,27 +89,38 @@ func TestColorLed_Blue(t *testing.T) {
 	setLedBackup := setLed
 	defer func() { setLed = setLedBackup }()
 
-	ledColors := make(map[gpio.PinIO]int)
+	l := New()
+	fakeLed := struct {
+		redValue   int
+		greenValue int
+		blueValue  int
+	}{}
 	setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 		mutex.Lock()
 		defer mutex.Unlock()
-		ledColors[led] = v
+		switch led {
+		case l.pinRed:
+			fakeLed.redValue = v
+		case l.pinGreen:
+			fakeLed.greenValue = v
+		case l.pinBlue:
+			fakeLed.blueValue = v
+		}
 	}
 
-	l := New()
 	if l.Blue() != 0 {
 		t.Errorf("%T.Blue(): %v, wants %v", l, l.Blue(), 0)
 	}
-	if ledColors[l.pinBlue] != 0 {
-		t.Errorf("colorValue: %v, wants %v", ledColors[l.pinBlue], 0)
+	if fakeLed.blueValue != 0 {
+		t.Errorf("colorValue: %v, wants %v", fakeLed.blueValue, 0)
 	}
 
 	l.SetColor(ColorBlue)
 	if l.Blue() != 255 {
 		t.Errorf("%T.Blue(): %v, wants %v", l, l.Blue(), 255)
 	}
-	if ledColors[l.pinBlue] != 255 {
-		t.Errorf("colorValue: %v, wants %v", ledColors[l.pinBlue], 255)
+	if fakeLed.blueValue != 255 {
+		t.Errorf("colorValue: %v, wants %v", fakeLed.blueValue, 255)
 	}
 }
 
