@@ -50,7 +50,7 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 		}
 		value := msg.DriveMode
 		if l.color != c.color {
-			t.Errorf("driveMode(%v)=invalid value for color: %v, wants %v", value, l.color, c.color)
+			t.Errorf("driveMode(%v)=invalid value for expectedColor: %v, wants %v", value, l.color, c.color)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func TestLedPart_OnRecord(t *testing.T) {
 
 func TestLedPart_OnSpeedZone(t *testing.T) {
 	l := fakeLed{}
-	p := LedPart{led: &l, driveMode: events.DriveMode_PILOT}
+	p := LedPart{led: &l, mode: LedModeSpeedZone, driveMode: events.DriveMode_PILOT}
 
 	cases := []struct {
 		msg   mqtt.Message
@@ -109,7 +109,65 @@ func TestLedPart_OnSpeedZone(t *testing.T) {
 		}
 		value := msg.GetSpeedZone()
 		if l.color != c.color {
-			t.Errorf("driveMode(%v)=invalid value for color: %v, wants %v", value, l.color, c.color)
+			t.Errorf("driveMode(%v)=invalid value for expectedColor: %v, wants %v", value, l.color, c.color)
 		}
+	}
+}
+
+func TestLedPart_OnThrottle(t *testing.T) {
+
+	cases := []struct {
+		name          string
+		msg           mqtt.Message
+		expectedColor led.Color
+	}{
+		{"throttle stop",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: 0.}),
+			led.ColorBlue,
+		},
+		{
+			"throttle normal",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: 0.5}),
+			led.ColorBlue,
+		},
+		{
+			"near zero",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.01}),
+			led.ColorBlue,
+		},
+		{
+			"slow brake",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.06}),
+			led.Color{Red: 15},
+		},
+		{
+			"normal brake",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.5}),
+			led.Color{Red: 127},
+		},
+		{
+			"high brake",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -1.}),
+			led.ColorRed,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			l := fakeLed{}
+			p := LedPart{led: &l, mode: LedModeBrake, driveMode: events.DriveMode_PILOT}
+
+			p.onThrottle(nil, c.msg)
+			time.Sleep(1 * time.Millisecond)
+			var msg events.ThrottleMessage
+			err := proto.Unmarshal(c.msg.Payload(), &msg)
+			if err != nil {
+				t.Errorf("unable to unmarshal drive mode message: %v", err)
+			}
+			value := msg.GetThrottle()
+			if l.color != c.expectedColor {
+				t.Errorf("driveMode(%v)=invalid value for expectedColor: %v, wants %v", value, l.color, c.expectedColor)
+			}
+		})
 	}
 }
