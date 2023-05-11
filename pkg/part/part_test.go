@@ -138,17 +138,22 @@ func TestLedPart_OnThrottle(t *testing.T) {
 		{
 			"slow brake",
 			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.06}),
-			led.Color{Red: 15},
+			led.ColorWhite,
 		},
 		{
 			"normal brake",
-			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.5}),
-			led.Color{Red: 127},
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.4}),
+			led.ColorYellow,
+		},
+		{
+			"normal high brake",
+			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -0.6}),
+			led.ColorRed,
 		},
 		{
 			"high brake",
 			testtools.NewFakeMessageFromProtobuf("throttle", &events.ThrottleMessage{Throttle: -1.}),
-			led.ColorRed,
+			led.ColorPurple,
 		},
 	}
 

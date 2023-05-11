@@ -21,6 +21,7 @@ func init() {
 var (
 	ColorBlack  = Color{0, 0, 0}
 	ColorRed    = Color{255, 0, 0}
+	ColorPurple = Color{255, 0, 255}
 	ColorYellow = Color{255, 255, 0}
 	ColorGreen  = Color{0, 255, 0}
 	ColorBlue   = Color{0, 0, 255}
@@ -145,6 +146,7 @@ func (l *PiColorLed) blink(freq float64) {
 var setLed = func(v int, led gpio.PinIO, mutex *sync.Mutex) {
 	mutex.Lock()
 	defer mutex.Unlock()
+
 	lvl := gpio.High
 	if v == 0 {
 		lvl = gpio.Low

@@ -161,7 +161,17 @@ func (p *LedPart) updateColor() {
 	defer p.muThrottle.Unlock()
 
 	if p.throttle <= -0.05 {
-		p.led.SetColor(led.Color{Red: int(p.throttle * -255)})
+		col := led.ColorWhite
+		if p.throttle <= -0.25 {
+			col = led.ColorYellow
+			if p.throttle <= -0.5 {
+				col = led.ColorRed
+				if p.throttle <= -0.75 {
+					col = led.ColorPurple
+				}
+			}
+		}
+		p.led.SetColor(col)
 		return
 	}
 
