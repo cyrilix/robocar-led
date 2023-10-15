@@ -187,6 +187,8 @@ func (p *LedPart) updateSpeedZoneColor() {
 	switch p.driveMode {
 	case events.DriveMode_USER:
 		p.led.SetColor(led.ColorGreen)
+	case events.DriveMode_COPILOT:
+		p.led.SetColor(led.ColorAqua)
 	case events.DriveMode_PILOT:
 		switch p.speedZone {
 		case events.SpeedZone_UNKNOWN:
@@ -206,6 +208,8 @@ func (p *LedPart) updateBrakeColor() {
 	switch p.driveMode {
 	case events.DriveMode_USER:
 		p.led.SetColor(led.ColorGreen)
+	case events.DriveMode_COPILOT:
+		p.led.SetColor(led.ColorAqua)
 	case events.DriveMode_PILOT:
 		p.led.SetColor(led.ColorBlue)
 	}

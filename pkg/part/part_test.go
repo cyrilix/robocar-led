@@ -36,6 +36,7 @@ func TestLedPart_OnDriveMode(t *testing.T) {
 		color led.Color
 	}{
 		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_USER}), led.ColorGreen},
+		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_COPILOT}), led.ColorAqua},
 		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_PILOT}), led.ColorBlue},
 		{testtools.NewFakeMessageFromProtobuf("drive", &events.DriveModeMessage{DriveMode: events.DriveMode_INVALID}), led.ColorBlue},
 	}

@@ -19,13 +19,15 @@ func init() {
 }
 
 var (
-	ColorBlack  = Color{0, 0, 0}
-	ColorRed    = Color{255, 0, 0}
-	ColorPurple = Color{255, 0, 255}
-	ColorYellow = Color{255, 255, 0}
-	ColorGreen  = Color{0, 255, 0}
-	ColorBlue   = Color{0, 0, 255}
-	ColorWhite  = Color{255, 255, 255}
+	ColorBlack     = Color{0, 0, 0}
+	ColorRed       = Color{255, 0, 0}
+	ColorPurple    = Color{255, 0, 255}
+	ColorYellow    = Color{255, 255, 0}
+	ColorGreen     = Color{0, 255, 0}
+	ColorTurquoise = Color{64, 224, 208}
+	ColorAqua      = Color{0, 255, 255}
+	ColorBlue      = Color{0, 0, 255}
+	ColorWhite     = Color{255, 255, 255}
 )
 
 func New() *PiColorLed {
